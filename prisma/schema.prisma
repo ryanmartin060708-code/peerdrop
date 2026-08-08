@@ -1,0 +1,50 @@
+// Prisma Schema for PeerDrop
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SessionStatus {
+  WAITING
+  CONNECTING
+  CONNECTED
+  TRANSFERRING
+  COMPLETED
+  EXPIRED
+  CANCELLED
+}
+
+model User {
+  id               String            @id @default(uuid())
+  email            String            @unique
+  name             String
+  passwordHash     String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  sentSessions     TransferSession[] @relation("SenderSessions")
+  receivedSessions TransferSession[] @relation("ReceiverSessions")
+
+  @@map("users")
+}
+
+model TransferSession {
+  id          String        @id @default(uuid())
+  roomCode    String        @unique
+  senderId    String
+  receiverId  String?
+  status      SessionStatus @default(WAITING)
+  totalSize   BigInt        @default(0)
+  fileCount   Int           @default(0)
+  createdAt   DateTime      @default(now())
+  expiresAt   DateTime
+
+  sender   User  @relation("SenderSessions", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User? @relation("ReceiverSessions", fields: [receiverId], references: [id], onDelete: SetNull)
+
+  @@map("transfer_sessions")
+}
