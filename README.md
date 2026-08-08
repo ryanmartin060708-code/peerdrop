@@ -126,115 +126,138 @@ peer-drop/
 
 ---
 
-## 🚦 Getting Started & Step-by-Step Terminal Commands
+## 🚦 Getting Started — Step-by-Step Terminal Commands
 
 ### Prerequisites
-- **Node.js**: v20+ (`node -v`)
-- **npm**: v10+ (`npm -v`)
-- **Docker & Docker Compose**: (Optional, for database or full stack containerization)
+- **Node.js** v20+ — verify with `node -v`
+- **npm** v10+ — verify with `npm -v`
+- **Docker Desktop** — needed only for the PostgreSQL database container
 
 ---
 
-### Option A: Local Development Setup (Step-by-Step Terminal Instructions)
+### Step 1: Clone & Navigate into the Project
 
-Follow these exact commands sequentially in your terminal:
-
-#### Step 1: Open Terminal & Navigate to Project Root
 ```bash
+git clone https://github.com/ryanmartin060708-code/peerdrop.git
 cd peerdrop
 ```
 
-#### Step 2: Install All Dependencies (Root, Backend & Frontend)
+---
+
+### Step 2: Install Dependencies (Server + Client)
+
 ```bash
-npm run install:all
+cd server
+npm install
+cd ../client
+npm install
+cd ..
 ```
 
-#### Step 3: Set Up Environment Configuration
-```bash
-# Windows PowerShell / CMD:
-copy .env.example .env
+---
 
-# Bash / Linux / macOS:
+### Step 3: Create Your Environment File
+
+**Windows (PowerShell / CMD):**
+```powershell
+copy .env.example .env
+```
+
+**macOS / Linux:**
+```bash
 cp .env.example .env
 ```
 
-#### Step 4: Start PostgreSQL Database
+---
 
-**Option 4A — Using Docker (Recommended):**
+### Step 4: Start PostgreSQL via Docker
+
+Open **Docker Desktop** first, then run:
+
 ```bash
 docker compose up postgres -d
 ```
 
-**Option 4B — Using Local PostgreSQL:**
-Make sure PostgreSQL is running locally on port `5432` and matches your `DATABASE_URL` in `.env`.
+> If you already have PostgreSQL running locally on port 5432, skip this step.
 
-#### Step 5: Push Database Schema & Generate Prisma Client
+---
+
+### Step 5: Generate Prisma Client & Push Database Schema
+
 ```bash
+cd server
+npm run db:generate
 npm run db:push
+cd ..
 ```
-
-#### Step 6: Start Full Application (Backend + Frontend Concurrently)
-```bash
-npm run dev
-```
-
-This concurrently starts:
-- **Backend Express + Socket.IO Server**: `http://localhost:5000`
-- **Frontend Vite React App**: `http://localhost:5173`
 
 ---
 
-### Option B: Single Command Docker Setup (Production Mode)
+### Step 6: Start the Backend Server
 
-To build and launch the complete stack (PostgreSQL + Express Server + Nginx Frontend) in Docker:
+Open a terminal and run:
 
 ```bash
-# Build and start all services in detached mode
-docker compose up --build -d
-
-# View status of running containers
-docker compose ps
-
-# View live application logs
-docker compose logs -f
+cd server
+npx tsx src/index.ts
 ```
 
-Access PeerDrop at **http://localhost:5173**.
+You should see:
+
+```
+==================================================
+🚀 PeerDrop Server running on http://localhost:5000
+⚡ Socket.IO Signaling Server ready
+==================================================
+```
 
 ---
 
-### Step-by-Step WebRTC P2P Transfer Testing Procedure
+### Step 7: Start the Frontend Dev Server
 
-To test actual peer-to-peer file sharing between two peers:
+Open a **second terminal** and run:
 
-1. **Step 1: Open Sender Browser Window**
-   - Open Chrome or Firefox to `http://localhost:5173`.
-   - Register a new user account (e.g. `sender@example.com`) or click **"Send a file"**.
-   - Drag & drop one or multiple files into the uploader card.
-   - Click **"Create Secure Transfer"**.
-   - Note the **6-character Room Code** (e.g., `7K4P9X`) or copy the share URL.
+```bash
+cd client
+npx vite --host
+```
 
-2. **Step 2: Open Receiver Browser Window**
-   - Open an **Incognito / Private Window** or second browser (e.g. Edge/Firefox) to `http://localhost:5173`.
-   - Log in or register as a second user (e.g. `receiver@example.com`).
-   - Navigate to `/receive/7K4P9X` or enter `7K4P9X` in the Receive form.
-   - Click **"Accept & Connect"**.
+You should see:
 
-3. **Step 3: Direct Transfer & P2P Chat**
-   - WebRTC `RTCDataChannel` will connect directly between the two windows.
-   - Files will stream chunk-by-chunk with continuous progress, speed (MB/s), and ETA telemetry.
-   - SHA-256 hash checks run automatically upon completion with a green **"SHA-256 Integrity Verified"** badge.
-   - Test sending text messages over the RTCDataChannel chat panel.
+```
+VITE v5.4.21  ready in 365 ms
+
+➜  Local:   http://localhost:5173/
+➜  Network: http://10.x.x.x:5173/
+```
+
+---
+
+### Step 8: Open in Browser
+
+Go to **http://localhost:5173/** — PeerDrop is running!
+
+---
+
+### Testing a Full P2P File Transfer
+
+1. **Sender** — Open `http://localhost:5173` in Chrome.  
+   Register an account → Click **Send a file** → Drag & drop files → Click **Create Secure Transfer** → Note the 6-character room code.
+
+2. **Receiver** — Open `http://localhost:5173` in an Incognito window or a different browser.  
+   Register a second account → Go to **Receive Files** → Enter the room code → Click **Accept & Connect**.
+
+3. **Transfer** — Files stream directly between the two browser windows via WebRTC `RTCDataChannel`. SHA-256 integrity verification runs automatically on completion.
 
 ---
 
 ### Build & Verification Commands
 
 ```bash
-# Verify backend TypeScript compilation:
+# Backend TypeScript compilation check:
 cd server && npm run build
 
-# Verify frontend Vite production build:
+# Frontend production build check:
 cd client && npm run build
 ```
 
