@@ -31,7 +31,7 @@ sequenceDiagram
     Server->>PeerB: Forward ICE Candidates
 
     Note over PeerA, PeerB: PHASE 2: Direct Peer-to-Peer Data Transfer
-    PeerA flex-->>PeerB: WebRTC RTCDataChannel Established (Direct P2P)
+    PeerA-->>PeerB: WebRTC RTCDataChannel Established (Direct P2P)
     PeerA->>PeerB: Control Channel: File Metadata & SHA-256 Hash
     PeerB->>PeerA: Control Channel: Accept Transfer
     loop 64 KB Binary File Chunks
