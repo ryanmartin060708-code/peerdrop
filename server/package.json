@@ -7,7 +7,7 @@
     "dev": "npx tsx watch src/index.ts",
     "build": "npx tsc",
     "start": "node dist/index.js",
-    "db:push": "npx prisma db push",
+    "db:push": "cd .. && npx prisma db push --schema=prisma/schema.prisma --skip-generate",
     "db:generate": "npx prisma generate --schema=../prisma/schema.prisma"
   },
   "dependencies": {
