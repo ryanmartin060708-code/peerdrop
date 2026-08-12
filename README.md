@@ -172,7 +172,17 @@ cp .env.example .env
 
 ### Step 4: Start PostgreSQL via Docker
 
-Open **Docker Desktop** first, then run:
+Start **Docker Desktop** and wait until its status says **Engine running**. On Windows, opening the app is not sufficient—the Docker engine must finish starting before Compose can connect.
+
+Verify that the engine is available:
+
+```powershell
+docker info
+```
+
+If this command reports that it cannot connect to `dockerDesktopLinuxEngine` (or `docker_engine`), Docker Desktop is not running yet. Open Docker Desktop, wait for **Engine running**, then run `docker info` again. If it still cannot connect, restart Docker Desktop and make sure it is configured to use Linux containers.
+
+Once `docker info` succeeds, start PostgreSQL:
 
 ```bash
 docker compose up postgres -d
